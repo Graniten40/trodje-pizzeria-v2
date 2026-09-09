@@ -2,17 +2,21 @@ using Microsoft.EntityFrameworkCore;
 using PizzeriaOrder.Api.Data;
 using PizzeriaOrder.Api.DTOs.Orders;
 using PizzeriaOrder.Api.Models.Orders;
+using PizzeriaOrder.Api.Services.Email;
 
 namespace PizzeriaOrder.Api.Services.Orders;
 
 public class OrderService : IOrderService
 {
     private readonly PizzeriaDbContext _dbContext;
+    private readonly IEmailService _emailService;
 
-    public OrderService(PizzeriaDbContext dbContext)
+    public OrderService(PizzeriaDbContext dbContext, IEmailService emailService)
     {
         _dbContext = dbContext;
+        _emailService = emailService;
     }
+    
 
     public async Task<OrderDto> CreateOrderAsync(
         CreateOrderDto dto,
@@ -171,6 +175,21 @@ public class OrderService : IOrderService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        if (!string.IsNullOrWhiteSpace(order.Email))
+        {
+            try
+            {
+                await _emailService.SendOrderConfirmationAsync(
+                    order,
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Kunde inte skicka orderbekräftelse för order {order.Id}: {ex.Message}");
+            }
+        }
+
         return MapOrder(order);
     }
 
@@ -238,6 +257,21 @@ public class OrderService : IOrderService
         order.Status = normalizedStatus;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(order.Email))
+        {
+            try
+            {
+                await _emailService.SendOrderStatusEmailAsync(
+                    order,
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"Kunde inte skicka statusmejl för order {order.Id}: {ex.Message}");
+            }
+        }
 
         return MapOrder(order);
     }

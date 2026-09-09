@@ -165,24 +165,30 @@ export default function ProductModal({
 
   function handleAdd() {
     if (!item || !canAdd) {
-        return;
+      return;
     }
 
-    const menuItem = item;
+    console.log(
+      "PRODUCT MODAL - lägger till:",
+      item.name,
+      quantity,
+      selectedVariant,
+      selectedExtras
+    );
 
     addItem({
-        menuItem,
-        quantity,
-        variant: selectedVariant,
-        extras: selectedExtras,
-        comment:
-        comment.trim()
-            ? comment.trim()
-            : null,
+      menuItem: item,
+      quantity,
+      variant: selectedVariant,
+      extras: selectedExtras,
+      comment:
+        comment.trim() !== ""
+          ? comment.trim()
+          : null,
     });
 
     onClose();
-    }
+  }
 
   return (
     <div

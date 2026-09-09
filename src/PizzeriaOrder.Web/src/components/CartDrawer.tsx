@@ -1,21 +1,14 @@
-import {
-  useState,
-} from "react";
-
+import { useState } from "react";
 import { useCart } from "../cart/CartContext";
+import CheckoutModal from "./CheckoutModal";
 
-function formatPrice(
-  price: number
-) {
-  return new Intl.NumberFormat(
-    "sv-SE",
-    {
-      style: "currency",
-      currency: "SEK",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }
-  ).format(price);
+function formatPrice(price: number) {
+  return new Intl.NumberFormat("sv-SE", {
+    style: "currency",
+    currency: "SEK",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
 }
 
 export default function CartDrawer() {
@@ -23,188 +16,161 @@ export default function CartDrawer() {
     items,
     totalItems,
     totalPrice,
+    updateItemQuantity,
     removeItem,
     clearCart,
   } = useCart();
 
   const [
-    isOpen,
-    setIsOpen,
+    showCheckout,
+    setShowCheckout,
   ] = useState(false);
-
-  if (items.length === 0) {
-    return null;
-  }
 
   return (
     <>
-      <button
-        type="button"
-        className="cart-floating-button"
-        onClick={() =>
-          setIsOpen(true)
-        }
-      >
-        <span>
-          🛒 Varukorg
-        </span>
+      <aside className="cart-sidebar">
+        <div className="cart-sidebar__header">
+          <h2>Din kundvagn</h2>
 
-        <strong>
-          {totalItems}
-        </strong>
+          <p>
+            {totalItems}{" "}
+            {totalItems === 1
+              ? "vara"
+              : "varor"}
+          </p>
+        </div>
 
-        <span>
-          {formatPrice(
-            totalPrice
-          )}
-        </span>
-      </button>
-
-      {isOpen && (
-        <div
-          className="cart-drawer-backdrop"
-          onClick={() =>
-            setIsOpen(false)
-          }
-        >
-          <aside
-            className="cart-drawer"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <div className="cart-drawer__header">
-              <div>
-                <p className="section-eyebrow">
-                  DIN BESTÄLLNING
-                </p>
-
-                <h2>
-                  Varukorg
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                className="cart-drawer__close"
-                onClick={() =>
-                  setIsOpen(false)
-                }
-                aria-label="Stäng varukorgen"
-              >
-                ×
-              </button>
+        {items.length === 0 ? (
+          <div className="cart-sidebar__empty">
+            <div className="cart-sidebar__empty-icon">
+              🛒
             </div>
 
-            <div className="cart-drawer__items">
-              {items.map(
-                (item) => (
-                  <article
-                    key={
-                      item.key
-                    }
-                    className="cart-item"
-                  >
-                    <div className="cart-item__top">
-                      <div>
-                        <h3>
-                          {
-                            item.quantity
-                          }
-                          ×{" "}
-                          {
-                            item.name
-                          }
-                        </h3>
+            <p>
+              Din kundvagn är tom.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="cart-sidebar__items">
+              {items.map((item) => (
+                <article
+                  key={item.key}
+                  className="cart-item"
+                >
+                  <div className="cart-item__top">
+                    <div>
+                      <h3>
+                        {item.quantity} ×{" "}
+                        {item.name}
+                      </h3>
 
-                        {item.variant && (
-                          <p>
-                            {
-                              item
-                                .variant
-                                .name
-                            }
-                          </p>
-                        )}
-                      </div>
-
-                      <strong>
-                        {formatPrice(
-                          item.totalPrice
-                        )}
-                      </strong>
+                      {item.variant && (
+                        <p>
+                          {item.variant.name}
+                        </p>
+                      )}
                     </div>
 
-                    {item.extras.length >
-                      0 && (
-                      <div className="cart-item__extras">
-                        {item.extras.map(
-                          (
-                            extra
-                          ) => (
-                            <span
-                              key={
-                                extra.id
-                              }
-                            >
-                              +{" "}
-                              {
-                                extra.name
-                              }
+                    <strong>
+                      {formatPrice(
+                        item.totalPrice
+                      )}
+                    </strong>
+                  </div>
 
-                              {extra.priceChange !==
-                                0 && (
-                                <>
-                                  {" "}
-                                  (
-                                  {extra.priceChange >
-                                  0
-                                    ? "+"
-                                    : ""}
-                                  {extra.priceChange}{" "}
-                                  kr)
-                                </>
-                              )}
-                            </span>
+                  {item.extras.length > 0 && (
+                    <div className="cart-item__extras">
+                      {item.extras.map(
+                        (extra) => (
+                          <span
+                            key={extra.id}
+                          >
+                            + {extra.name}
+
+                            {extra.priceChange !==
+                              0 && (
+                              <>
+                                {" "}
+                                (
+                                {extra.priceChange >
+                                0
+                                  ? "+"
+                                  : ""}
+                                {extra.priceChange}{" "}
+                                kr)
+                              </>
+                            )}
+                          </span>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {item.comment && (
+                    <p className="cart-item__comment">
+                      Kommentar:{" "}
+                      {item.comment}
+                    </p>
+                  )}
+
+                  <div className="cart-item__bottom">
+                    <div className="cart-item__quantity">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateItemQuantity(
+                            item.key,
+                            item.quantity -
+                              1
                           )
-                        )}
-                      </div>
-                    )}
-
-                    {item.comment && (
-                      <p className="cart-item__comment">
-                        Kommentar:{" "}
-                        {
-                          item.comment
                         }
-                      </p>
-                    )}
+                      >
+                        −
+                      </button>
 
-                    <div className="cart-item__bottom">
-                      <span>
-                        {formatPrice(
-                          item.unitPrice
-                        )}{" "}
-                        / st
-                      </span>
+                      <strong>
+                        {item.quantity}
+                      </strong>
 
                       <button
                         type="button"
                         onClick={() =>
-                          removeItem(
-                            item.key
+                          updateItemQuantity(
+                            item.key,
+                            item.quantity +
+                              1
                           )
                         }
                       >
-                        Ta bort
+                        +
                       </button>
                     </div>
-                  </article>
-                )
-              )}
+
+                    <button
+                      type="button"
+                      className="cart-item__remove"
+                      onClick={() =>
+                        removeItem(
+                          item.key
+                        )
+                      }
+                    >
+                      Ta bort
+                    </button>
+                  </div>
+
+                  <div className="cart-item__unit-price">
+                    {formatPrice(
+                      item.unitPrice
+                    )}{" "}
+                    / st
+                  </div>
+                </article>
+              ))}
             </div>
 
-            <div className="cart-drawer__summary">
+            <div className="cart-sidebar__summary">
               <div>
                 <span>
                   Antal
@@ -215,7 +181,7 @@ export default function CartDrawer() {
                 </strong>
               </div>
 
-              <div className="cart-drawer__total">
+              <div className="cart-sidebar__total">
                 <span>
                   Totalt
                 </span>
@@ -228,29 +194,33 @@ export default function CartDrawer() {
               </div>
             </div>
 
-            <div className="cart-drawer__actions">
-              <button
-                type="button"
-                className="cart-drawer__clear"
-                onClick={clearCart}
-              >
-                Töm varukorgen
-              </button>
+            <button
+              type="button"
+              className="cart-sidebar__checkout"
+              onClick={() =>
+                setShowCheckout(true)
+              }
+            >
+              GÅ TILL KASSAN
+            </button>
 
-              <button
-                type="button"
-                className="cart-drawer__checkout"
-                onClick={() => {
-                  console.log(
-                    "Gå till checkout"
-                  );
-                }}
-              >
-                GÅ TILL KASSAN
-              </button>
-            </div>
-          </aside>
-        </div>
+            <button
+              type="button"
+              className="cart-sidebar__clear"
+              onClick={clearCart}
+            >
+              Töm kundvagnen
+            </button>
+          </>
+        )}
+      </aside>
+
+      {showCheckout && (
+        <CheckoutModal
+          onClose={() =>
+            setShowCheckout(false)
+          }
+        />
       )}
     </>
   );

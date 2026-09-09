@@ -19,6 +19,11 @@ interface CartContextValue {
     input: AddCartItemInput
   ) => void;
 
+  updateItemQuantity: (
+    key: string,
+    quantity: number
+  ) => void;
+
   removeItem: (
     key: string
   ) => void;
@@ -101,6 +106,7 @@ export function CartProvider({
             item.key === key
               ? {
                   ...item,
+
                   quantity:
                     item.quantity +
                     input.quantity,
@@ -118,6 +124,7 @@ export function CartProvider({
 
       const newItem: CartItem = {
         key,
+
         menuItemId:
           input.menuItem.id,
 
@@ -128,7 +135,9 @@ export function CartProvider({
           input.quantity,
 
         basePrice:
-          input.menuItem.price ?? 0,
+          input.variant?.price ??
+          input.menuItem.price ??
+          0,
 
         variant:
           input.variant,
@@ -153,15 +162,38 @@ export function CartProvider({
     });
   }
 
+  function updateItemQuantity(
+    key: string,
+    quantity: number
+  ) {
+    if (quantity <= 0) {
+      removeItem(key);
+      return;
+    }
+
+    setItems((current) =>
+      current.map((item) =>
+        item.key === key
+          ? {
+              ...item,
+              quantity,
+              totalPrice:
+                item.unitPrice *
+                quantity,
+            }
+          : item
+      )
+    );
+  }
+
   function removeItem(
     key: string
   ) {
-    setItems(
-      (current) =>
-        current.filter(
-          (item) =>
-            item.key !== key
-        )
+    setItems((current) =>
+      current.filter(
+        (item) =>
+          item.key !== key
+      )
     );
   }
 
@@ -200,6 +232,7 @@ export function CartProvider({
         totalItems,
         totalPrice,
         addItem,
+        updateItemQuantity,
         removeItem,
         clearCart,
       }),

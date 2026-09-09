@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PizzeriaOrder.Api.Data;
+using PizzeriaOrder.Api.Services.Email;
 using PizzeriaOrder.Api.Services.Menu;
 using PizzeriaOrder.Api.Services.Orders;
 
@@ -11,13 +12,18 @@ builder.Services.AddDbContext<PizzeriaDbContext>(options =>
 
 // Controllers
 builder.Services.AddControllers();
+
+// Services
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IEmailService, BrevoEmailService>();
+
+// HttpClient för Brevo
+builder.Services.AddHttpClient();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddScoped<IOrderService, OrderService>();
 
 // CORS
 builder.Services.AddCors(options =>

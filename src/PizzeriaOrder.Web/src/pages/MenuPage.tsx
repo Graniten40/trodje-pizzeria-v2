@@ -6,8 +6,8 @@ import {
 
 import Header from "../components/Header";
 import ProductModal from "../components/ProductModal";
-import { getMenu } from "../services/menuApi";
 import CartDrawer from "../components/CartDrawer";
+import { getMenu } from "../services/menuApi";
 
 import type {
   MenuCategory,
@@ -269,134 +269,138 @@ export default function MenuPage() {
               </div>
             </nav>
 
-            <div className="menu-groups">
-              {groupedMenu.map(
-                (group) => (
-                  <section
-                    key={group.id}
-                    id={`menu-group-${group.id}`}
-                    className="menu-group"
-                  >
-                    <div className="menu-group__heading">
-                      <h2>
-                        {group.label}
-                      </h2>
+            <div className="menu-order-layout">
+              <div className="menu-groups">
+                {groupedMenu.map(
+                  (group) => (
+                    <section
+                      key={group.id}
+                      id={`menu-group-${group.id}`}
+                      className="menu-group"
+                    >
+                      <div className="menu-group__heading">
+                        <h2>
+                          {group.label}
+                        </h2>
 
-                      <span />
-                    </div>
+                        <span />
+                      </div>
 
-                    {group.categories.map(
-                      (category) => (
-                        <section
-                          key={
-                            category.id
-                          }
-                          id={`category-${slugify(
-                            category.name
-                          )}`}
-                          className="menu-category"
-                        >
-                          <div className="menu-category__heading">
-                            <h3>
-                              {
-                                category.name
-                              }
-                            </h3>
+                      {group.categories.map(
+                        (category) => (
+                          <section
+                            key={
+                              category.id
+                            }
+                            id={`category-${slugify(
+                              category.name
+                            )}`}
+                            className="menu-category"
+                          >
+                            <div className="menu-category__heading">
+                              <h3>
+                                {
+                                  category.name
+                                }
+                              </h3>
 
-                            {category.name
-                              .toLowerCase()
-                              .includes(
-                                "pizz"
-                              ) && (
-                              <p>
-                                I våra pizzor
-                                ingår tomat och
-                                ost.
-                              </p>
-                            )}
-                          </div>
+                              {category.name
+                                .toLowerCase()
+                                .includes(
+                                  "pizz"
+                                ) && (
+                                <p>
+                                  I våra pizzor
+                                  ingår tomat och
+                                  ost.
+                                </p>
+                              )}
+                            </div>
 
-                          <div className="menu-items">
-                            {category.items.map(
-                              (item) => (
-                                <article
-                                  key={
-                                    item.id
-                                  }
-                                  className="menu-item"
-                                >
-                                  <div className="menu-item__main">
-                                    <div className="menu-item__text">
-                                      <h4>
-                                        {
-                                          item.name
-                                        }
-                                      </h4>
-
-                                      {item.description && (
-                                        <p>
+                            <div className="menu-items">
+                              {category.items.map(
+                                (item) => (
+                                  <article
+                                    key={
+                                      item.id
+                                    }
+                                    className="menu-item"
+                                  >
+                                    <div className="menu-item__main">
+                                      <div className="menu-item__text">
+                                        <h4>
                                           {
-                                            item.description
+                                            item.name
                                           }
-                                        </p>
-                                      )}
+                                        </h4>
 
-                                      {item.variants.length >
-                                        0 && (
-                                        <div className="menu-item__variants">
-                                          {item.variants.map(
-                                            (
-                                              variant
-                                            ) => (
-                                              <span
-                                                key={
-                                                  variant.id
-                                                }
-                                              >
-                                                {
-                                                  variant.name
-                                                }
-                                                :{" "}
-                                                {formatPrice(
-                                                  variant.price
-                                                )}
-                                              </span>
-                                            )
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    <div className="menu-item__right">
-                                      <strong>
-                                        {getItemPriceText(
-                                          item
+                                        {item.description && (
+                                          <p>
+                                            {
+                                              item.description
+                                            }
+                                          </p>
                                         )}
-                                      </strong>
 
-                                      <button
-                                        type="button"
-                                        className="menu-item__add"
-                                        onClick={() =>
-                                          setSelectedItem(
+                                        {item.variants.length >
+                                          0 && (
+                                          <div className="menu-item__variants">
+                                            {item.variants.map(
+                                              (
+                                                variant
+                                              ) => (
+                                                <span
+                                                  key={
+                                                    variant.id
+                                                  }
+                                                >
+                                                  {
+                                                    variant.name
+                                                  }
+                                                  :{" "}
+                                                  {formatPrice(
+                                                    variant.price
+                                                  )}
+                                                </span>
+                                              )
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      <div className="menu-item__right">
+                                        <strong>
+                                          {getItemPriceText(
                                             item
-                                          )
-                                        }
-                                      >
-                                        Lägg till
-                                      </button>
+                                          )}
+                                        </strong>
+
+                                        <button
+                                          type="button"
+                                          className="menu-item__add"
+                                          onClick={() =>
+                                            setSelectedItem(
+                                              item
+                                            )
+                                          }
+                                        >
+                                          Lägg till
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                </article>
-                              )
-                            )}
-                          </div>
-                        </section>
-                      )
-                    )}
-                  </section>
-                )
-              )}
+                                  </article>
+                                )
+                              )}
+                            </div>
+                          </section>
+                        )
+                      )}
+                    </section>
+                  )
+                )}
+              </div>
+
+              <CartDrawer />
             </div>
           </>
         )}
@@ -407,7 +411,6 @@ export default function MenuPage() {
             setSelectedItem(null)
           }
         />
-        <CartDrawer />
       </main>
     </>
   );

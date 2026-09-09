@@ -20,90 +20,161 @@ import type {
 
 const RESTAURANT_ID = 1;
 
+const POLLING_START_HOUR = 10;
+const POLLING_END_HOUR = 11;
+
+const POLLING_INTERVAL_MS = 5000;
+const SCHEDULE_CHECK_INTERVAL_MS = 30000;
+
+function isPollingTime() {
+  const now = new Date();
+
+  const minutesSinceMidnight =
+    now.getHours() * 60 +
+    now.getMinutes();
+
+  const startMinutes =
+    POLLING_START_HOUR * 60;
+
+  const endMinutes =
+    POLLING_END_HOUR * 60;
+
+  return (
+    minutesSinceMidnight >= startMinutes &&
+    minutesSinceMidnight < endMinutes
+  );
+}
+
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [historyOrders, setHistoryOrders] =
+  const [orders, setOrders] =
     useState<Order[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [
+    historyOrders,
+    setHistoryOrders,
+  ] = useState<Order[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   const [error, setError] =
     useState<string | null>(null);
 
-  const [soundEnabled, setSoundEnabled] =
-    useState(false);
+  const [
+    soundEnabled,
+    setSoundEnabled,
+  ] = useState(false);
 
-  const [showHistory, setShowHistory] =
-    useState(false);
+  const [
+    showHistory,
+    setShowHistory,
+  ] = useState(false);
+
+  const [
+    pollingActive,
+    setPollingActive,
+  ] = useState(
+    isPollingTime()
+  );
 
   const knownOrderIds =
-    useRef<Set<number>>(new Set());
+    useRef<Set<number>>(
+      new Set()
+    );
 
   const audioContextRef =
-    useRef<AudioContext | null>(null);
+    useRef<AudioContext | null>(
+      null
+    );
 
-  const playNewOrderSound = useCallback(() => {
-    const audioContext =
-      audioContextRef.current;
+  const playNewOrderSound =
+    useCallback(() => {
+      const audioContext =
+        audioContextRef.current;
 
-    if (
-      !audioContext ||
-      audioContext.state !== "running"
-    ) {
-      return;
-    }
+      if (
+        !audioContext ||
+        audioContext.state !==
+          "running"
+      ) {
+        return;
+      }
 
-    const now = audioContext.currentTime;
+      const now =
+        audioContext.currentTime;
 
-    const playTone = (
-      frequency: number,
-      startDelay: number,
-      duration: number
-    ) => {
-      const oscillator =
-        audioContext.createOscillator();
+      const playTone = (
+        frequency: number,
+        startDelay: number,
+        duration: number
+      ) => {
+        const oscillator =
+          audioContext.createOscillator();
 
-      const gain =
-        audioContext.createGain();
+        const gain =
+          audioContext.createGain();
 
-      oscillator.type = "sine";
-      oscillator.frequency.value =
-        frequency;
+        oscillator.type = "sine";
 
-      gain.gain.setValueAtTime(
-        0.0001,
-        now + startDelay
+        oscillator.frequency.value =
+          frequency;
+
+        gain.gain.setValueAtTime(
+          0.0001,
+          now + startDelay
+        );
+
+        gain.gain
+          .exponentialRampToValueAtTime(
+            1,
+            now +
+              startDelay +
+              0.02
+          );
+
+        gain.gain
+          .exponentialRampToValueAtTime(
+            0.0001,
+            now +
+              startDelay +
+              duration
+          );
+
+        oscillator.connect(gain);
+
+        gain.connect(
+          audioContext.destination
+        );
+
+        oscillator.start(
+          now + startDelay
+        );
+
+        oscillator.stop(
+          now +
+            startDelay +
+            duration
+        );
+      };
+
+      playTone(
+        880,
+        0,
+        0.65
       );
 
-      gain.gain.exponentialRampToValueAtTime(
-        1,
-        now + startDelay + 0.02
+      playTone(
+        1320,
+        0.18,
+        0.75
       );
 
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        now + startDelay + duration
+      playTone(
+        1760,
+        0.36,
+        0.8
       );
-
-      oscillator.connect(gain);
-
-      gain.connect(
-        audioContext.destination
-      );
-
-      oscillator.start(
-        now + startDelay
-      );
-
-      oscillator.stop(
-        now + startDelay + duration
-      );
-    };
-
-    playTone(880, 0, 0.65);
-    playTone(1320, 0.18, 0.75);
-    playTone(1760, 0.36, 0.8);
-  }, []);
+    }, []);
 
   async function enableSound() {
     try {
@@ -146,18 +217,25 @@ export default function OrdersPage() {
 
   async function loadHistoryOrders() {
     try {
-      const data = await getOrders(
-        RESTAURANT_ID
-      );
+      const data =
+        await getOrders(
+          RESTAURANT_ID
+        );
 
-      const history = data.filter(
-        (order) =>
-          order.status === "Collected" ||
-          order.status === "Rejected" ||
-          order.status === "Cancelled"
-      );
+      const history =
+        data.filter(
+          (order) =>
+            order.status ===
+              "Collected" ||
+            order.status ===
+              "Rejected" ||
+            order.status ===
+              "Cancelled"
+        );
 
-      setHistoryOrders(history);
+      setHistoryOrders(
+        history
+      );
     } catch {
       setError(
         "Kunde inte hämta orderhistoriken."
@@ -165,71 +243,126 @@ export default function OrdersPage() {
     }
   }
 
-  const loadOrders = useCallback(async () => {
-    try {
-      setError(null);
+  const loadOrders =
+    useCallback(
+      async () => {
+        try {
+          setError(null);
 
-      const data =
-        await getActiveOrders(
-          RESTAURANT_ID
-        );
+          const data =
+            await getActiveOrders(
+              RESTAURANT_ID
+            );
 
-      const previousIds =
-        knownOrderIds.current;
+          const previousIds =
+            knownOrderIds.current;
 
-      if (previousIds.size > 0) {
-        const hasNewOrder =
-          data.some(
-            (order) =>
-              order.status === "New" &&
-              !previousIds.has(order.id)
+          if (
+            previousIds.size >
+            0
+          ) {
+            const hasNewOrder =
+              data.some(
+                (order) =>
+                  order.status ===
+                    "New" &&
+                  !previousIds.has(
+                    order.id
+                  )
+              );
+
+            if (
+              hasNewOrder &&
+              soundEnabled
+            ) {
+              playNewOrderSound();
+            }
+          }
+
+          knownOrderIds.current =
+            new Set(
+              data.map(
+                (order) =>
+                  order.id
+              )
+            );
+
+          setOrders(data);
+        } catch {
+          setError(
+            "Kunde inte hämta beställningarna."
           );
-
-        if (
-          hasNewOrder &&
-          soundEnabled
-        ) {
-          playNewOrderSound();
+        } finally {
+          setLoading(false);
         }
-      }
+      },
+      [
+        soundEnabled,
+        playNewOrderSound,
+      ]
+    );
 
-      knownOrderIds.current =
-        new Set(
-          data.map(
-            (order) => order.id
-          )
-        );
-
-      setOrders(data);
-    } catch {
-      setError(
-        "Kunde inte hämta beställningarna."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    soundEnabled,
-    playNewOrderSound,
-  ]);
-
+  /*
+   * Kontrollerar om klockan
+   * är mellan 10:00 och 11:00.
+   */
   useEffect(() => {
-    void loadOrders();
+    function updatePollingState() {
+      const active =
+        isPollingTime();
 
-    const interval =
+      setPollingActive(
+        active
+      );
+    }
+
+    updatePollingState();
+
+    const scheduleInterval =
       window.setInterval(
-        () => {
-          void loadOrders();
-        },
-        5000
+        updatePollingState,
+        SCHEDULE_CHECK_INTERVAL_MS
       );
 
     return () => {
       window.clearInterval(
-        interval
+        scheduleInterval
       );
     };
-  }, [loadOrders]);
+  }, []);
+
+  /*
+   * Automatisk polling.
+   *
+   * Kör endast mellan
+   * 10:00 och 11:00.
+   */
+  useEffect(() => {
+    if (!pollingActive) {
+      setLoading(false);
+
+      return;
+    }
+
+    void loadOrders();
+
+    const pollingInterval =
+      window.setInterval(
+        () => {
+          void loadOrders();
+        },
+        POLLING_INTERVAL_MS
+      );
+
+    return () => {
+      window.clearInterval(
+        pollingInterval
+      );
+    };
+  }, [
+    pollingActive,
+    loadOrders,
+  ]);
 
   async function handleStatusChange(
     orderId: number,
@@ -261,14 +394,17 @@ export default function OrdersPage() {
     }
 
     setShowHistory(
-      (current) => !current
+      (current) =>
+        !current
     );
   }
 
   if (loading) {
     return (
       <main className="orders-page">
-        <h1>Beställningar</h1>
+        <h1>
+          Beställningar
+        </h1>
 
         <p>
           Laddar beställningar...
@@ -289,6 +425,23 @@ export default function OrdersPage() {
             Aktiva beställningar:{" "}
             {orders.length}
           </p>
+
+          <p
+            className={
+              pollingActive
+                ? "orders-page__polling orders-page__polling--active"
+                : "orders-page__polling"
+            }
+          >
+            {pollingActive
+              ? "● Automatisk ordersökning aktiv"
+              : "Automatisk ordersökning pausad"}
+          </p>
+
+          <small>
+            Automatisk sökning:
+            10:00–11:00
+          </small>
         </div>
 
         <div className="orders-page__header-actions">
@@ -299,7 +452,9 @@ export default function OrdersPage() {
                 ? "sound-button sound-button--enabled"
                 : "sound-button"
             }
-            onClick={enableSound}
+            onClick={
+              enableSound
+            }
           >
             {soundEnabled
               ? "🔔 Ljud aktiverat"
@@ -322,7 +477,9 @@ export default function OrdersPage() {
             onClick={() => {
               void loadOrders();
 
-              if (showHistory) {
+              if (
+                showHistory
+              ) {
                 void loadHistoryOrders();
               }
             }}
@@ -341,12 +498,14 @@ export default function OrdersPage() {
       {orders.length === 0 ? (
         <section className="orders-page__empty">
           <h2>
-            Inga aktiva beställningar
+            Inga aktiva
+            beställningar
           </h2>
 
           <p>
-            Nya beställningar visas här
-            automatiskt.
+            {pollingActive
+              ? "Nya beställningar visas här automatiskt."
+              : "Automatisk ordersökning körs mellan 10:00 och 11:00."}
           </p>
         </section>
       ) : (
@@ -380,24 +539,33 @@ export default function OrdersPage() {
 
         {showHistory && (
           <div className="orders-history__content">
-            {historyOrders.length === 0 ? (
+            {historyOrders.length ===
+            0 ? (
               <p>
-                Det finns inga avslutade
+                Det finns inga
+                avslutade
                 beställningar.
               </p>
             ) : (
               <>
                 <p className="orders-history__count">
-                  Avslutade beställningar:{" "}
-                  {historyOrders.length}
+                  Avslutade
+                  beställningar:{" "}
+                  {
+                    historyOrders.length
+                  }
                 </p>
 
                 <div className="orders-page__list">
                   {historyOrders.map(
                     (order) => (
                       <OrderCard
-                        key={order.id}
-                        order={order}
+                        key={
+                          order.id
+                        }
+                        order={
+                          order
+                        }
                         onStatusChange={
                           handleStatusChange
                         }

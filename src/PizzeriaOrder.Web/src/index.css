@@ -313,3 +313,13 @@ button {
   color: #6b7280;
   font-weight: 600;
 }
+
+.orders-page__polling {
+  margin: 8px 0 2px;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.orders-page__polling--active {
+  color: #16a34a;
+}
