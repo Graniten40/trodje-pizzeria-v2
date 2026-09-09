@@ -21,7 +21,7 @@ import type {
 const RESTAURANT_ID = 1;
 
 const POLLING_START_HOUR = 10;
-const POLLING_END_HOUR = 11;
+const POLLING_END_HOUR = 23;
 
 const POLLING_INTERVAL_MS = 5000;
 const SCHEDULE_CHECK_INTERVAL_MS = 30000;
@@ -440,7 +440,7 @@ export default function OrdersPage() {
 
           <small>
             Automatisk sökning:
-            10:00–11:00
+            10:00–23:00
           </small>
         </div>
 
@@ -505,7 +505,7 @@ export default function OrdersPage() {
           <p>
             {pollingActive
               ? "Nya beställningar visas här automatiskt."
-              : "Automatisk ordersökning körs mellan 10:00 och 11:00."}
+              : "Automatisk ordersökning körs mellan 10:00 och 23:00."}
           </p>
         </section>
       ) : (
