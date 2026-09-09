@@ -21,14 +21,14 @@ export default function Hero() {
 
           <div className="hero__actions">
             <a
-              href="#meny"
+              href="/meny"
               className="button button--primary"
             >
               BESTÄLL ONLINE
             </a>
 
             <a
-              href="#meny"
+              href="/meny"
               className="button button--secondary"
             >
               VISA MENY

@@ -13,12 +13,29 @@ export default function Header() {
         </a>
 
         <nav className="site-header__nav">
-          <a href="/">Hem</a>
-          <a href="#meny">Meny</a>
-          <a href="#lunch">Lunch</a>
-          <a href="#presentkort">Presentkort</a>
-          <a href="#om-oss">Om oss</a>
-          <a href="#kontakt">Kontakt</a>
+          <a href="/">
+            Hem
+          </a>
+
+          <a href="/meny">
+            Meny
+          </a>
+
+          <a href="/#lunch">
+            Lunch
+          </a>
+
+          <a href="/#presentkort">
+            Presentkort
+          </a>
+
+          <a href="/#om-oss">
+            Om oss
+          </a>
+
+          <a href="/#kontakt">
+            Kontakt
+          </a>
         </nav>
 
         <div className="site-header__actions">
@@ -30,7 +47,7 @@ export default function Header() {
           </a>
 
           <a
-            href="#meny"
+            href="/meny"
             className="site-header__order"
           >
             BESTÄLL ONLINE

@@ -8,6 +8,26 @@ import type { MenuItem } from "../types/menu";
 
 const RESTAURANT_ID = 1;
 
+function getPriceText(
+  pizza: MenuItem
+) {
+  if (pizza.price !== null) {
+    return `${pizza.price} kr`;
+  }
+
+  if (pizza.variants.length > 0) {
+    const lowestPrice = Math.min(
+      ...pizza.variants.map(
+        (variant) => variant.price
+      )
+    );
+
+    return `Från ${lowestPrice} kr`;
+  }
+
+  return "";
+}
+
 export default function PopularPizzas() {
   const [pizzas, setPizzas] =
     useState<MenuItem[]>([]);
@@ -29,10 +49,10 @@ export default function PopularPizzas() {
         const pizzaItems =
           categories
             .filter((category) =>
-                category.name
-                    .toLowerCase()
-                    .includes("pizz")
-                )
+              category.name
+                .toLowerCase()
+                .includes("pizz")
+            )
             .flatMap(
               (category) =>
                 category.items
@@ -59,7 +79,9 @@ export default function PopularPizzas() {
         id="meny"
         className="popular-pizzas"
       >
-        <p>Laddar pizzor...</p>
+        <p>
+          Laddar pizzor...
+        </p>
       </section>
     );
   }
@@ -70,7 +92,9 @@ export default function PopularPizzas() {
         id="meny"
         className="popular-pizzas"
       >
-        <p>{error}</p>
+        <p>
+          {error}
+        </p>
       </section>
     );
   }
@@ -94,8 +118,9 @@ export default function PopularPizzas() {
 
       <div className="popular-pizzas__grid">
         {pizzas.map((pizza) => (
-          <article
+          <a
             key={pizza.id}
+            href="/meny"
             className="pizza-card"
           >
             <div className="pizza-card__image">
@@ -122,13 +147,13 @@ export default function PopularPizzas() {
                 </p>
               )}
 
-              {pizza.price !== null && (
-                <strong>
-                  {pizza.price} kr
-                </strong>
-              )}
+              <strong>
+                {getPriceText(
+                  pizza
+                )}
+              </strong>
             </div>
-          </article>
+          </a>
         ))}
       </div>
 
