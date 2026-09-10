@@ -7,14 +7,23 @@ export default function Hero() {
     <section className="hero">
       <div className="hero__inner">
         <div className="hero__content">
-          <p className="hero__eyebrow">
-            Välkommen till
-          </p>
+          <div className="hero__title-area">
+            <img
+              src="/hero/moose.png"
+              alt=""
+              className="hero__moose"
+              aria-hidden="true"
+            />
 
-          <h1>
-            TRÖDJE
-            <span>PIZZERIA</span>
-          </h1>
+            <p className="hero__eyebrow">
+              Välkommen till
+            </p>
+
+            <h1>
+              TRÖDJE
+              <span>PIZZERIA</span>
+            </h1>
+          </div>
 
           <p className="hero__description">
             Äkta pizza. Färska råvaror. Lagad med kärlek.

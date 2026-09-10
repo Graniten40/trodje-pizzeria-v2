@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useCart } from "../cart/CartContext";
 import CheckoutModal from "./CheckoutModal";
 
@@ -26,9 +26,53 @@ export default function CartDrawer() {
     setShowCheckout,
   ] = useState(false);
 
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileButtonRef = useRef<HTMLButtonElement>(null);
+
+  function closeMobileCart() {
+    setMobileOpen(false);
+    mobileButtonRef.current?.focus();
+  }
+
   return (
     <>
-      <aside className="cart-sidebar">
+      {!showCheckout && (totalItems > 0 || mobileOpen) && (
+        <button
+          ref={mobileButtonRef}
+          type="button"
+          className="cart-mobile-bar"
+          aria-expanded={mobileOpen}
+          aria-controls="cart-panel"
+          onClick={() => setMobileOpen((open) => !open)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") closeMobileCart();
+          }}
+        >
+          <span className="cart-mobile-bar__count">
+            🛒 {totalItems} {totalItems === 1 ? "vara" : "varor"}
+          </span>
+          <strong aria-live="polite" aria-atomic="true">
+            {formatPrice(totalPrice)}
+          </strong>
+          <span>{mobileOpen ? "Stäng" : "Visa varukorg"}</span>
+        </button>
+      )}
+
+      <aside
+        id="cart-panel"
+        aria-label="Din kundvagn"
+        className={`cart-sidebar${mobileOpen ? " cart-sidebar--mobile-open" : ""}`}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") closeMobileCart();
+        }}
+      >
+        <button
+          type="button"
+          className="cart-mobile-close"
+          onClick={closeMobileCart}
+        >
+          Stäng varukorgen ×
+        </button>
         <div className="cart-sidebar__header">
           <h2>Din kundvagn</h2>
 
@@ -197,9 +241,10 @@ export default function CartDrawer() {
             <button
               type="button"
               className="cart-sidebar__checkout"
-              onClick={() =>
-                setShowCheckout(true)
-              }
+              onClick={() => {
+                setMobileOpen(false);
+                setShowCheckout(true);
+              }}
             >
               GÅ TILL KASSAN
             </button>

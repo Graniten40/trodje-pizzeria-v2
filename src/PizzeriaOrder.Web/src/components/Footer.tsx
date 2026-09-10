@@ -10,9 +10,11 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="footer-logo-placeholder">
-            TRÖDJE
-            <span>PIZZERIA</span>
+          <div className="footer-logo">
+            <img
+              src="/images/logo/trodje-logo.png"
+              alt="Trödje Pizzeria"
+            />
           </div>
 
           <a href="/meny" className="footer-order">
