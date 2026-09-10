@@ -2547,3 +2547,134 @@
     font-size: 12px;
   }
 }
+
+/* =========================================
+   LUNCH + FAMILJEDEAL
+   ========================================= */
+
+.lunch-section {
+  padding: 80px 24px;
+  background: #f4f4f4;
+}
+
+.lunch-section__grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.lunch-card {
+  min-height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.lunch-card--light {
+  background: #fff;
+  border: 1px solid #e4e4e4;
+}
+
+.lunch-card--red {
+  background: #e3131b;
+  color: white;
+}
+
+.lunch-card__content {
+  width: 52%;
+  padding: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.lunch-card__visual {
+  width: 48%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lunch-card__image {
+  width: 125%;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  transform: translateX(-20px);
+}
+
+.lunch-card__eyebrow {
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.lunch-card h2 {
+  font-size: 40px;
+  line-height: 1.1;
+  margin: 0 0 20px;
+}
+
+.lunch-card--light h2,
+.lunch-card--light .lunch-card__price {
+  color: #e3131b;
+}
+
+.lunch-card__description {
+  margin-bottom: 20px;
+}
+
+.lunch-card__price {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 24px;
+}
+
+.lunch-card__button {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.lunch-card__button--light {
+  border: 1px solid #ccc;
+  color: #111;
+  background: white;
+}
+
+.lunch-card__button--dark {
+  background: #111;
+  color: white;
+}
+
+.lunch-card small {
+  display: block;
+  margin-top: 14px;
+}
+
+.lunch-card__pizza-icon {
+  font-size: 110px;
+}
+
+.lunch-card__family-image {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .lunch-section__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lunch-card {
+    min-height: 360px;
+  }
+}

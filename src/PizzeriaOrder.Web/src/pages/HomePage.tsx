@@ -2,6 +2,7 @@ import Header from "../components/Header";
 import Hero from "../components/Hero";
 import PopularPizzas from "../components/PopularPizzas";
 import GiftCardSection from "../components/GiftCardSection";
+import LunchSection from "../components/LunchSection";
 
 export default function HomePage() {
   return (
@@ -13,18 +14,9 @@ export default function HomePage() {
 
         <PopularPizzas />
 
+        <LunchSection />
+
         <GiftCardSection />
-
-        <section
-          id="lunch"
-          className="homepage-placeholder"
-        >
-          <p className="section-eyebrow">
-            LUNCH
-          </p>
-
-          <h2>Dagens lunch</h2>
-        </section>
 
         <section
           id="om-oss"
